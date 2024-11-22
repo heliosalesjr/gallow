@@ -1,3 +1,4 @@
+import Bricks from "./components/Bricks";
 import Header from "./components/Header"
 import Status from "./components/Status";
 import './index.css';
@@ -8,6 +9,7 @@ function App() {
     <>
       <Header />
       <Status />
+      <Bricks />
     </>
   )
 }
