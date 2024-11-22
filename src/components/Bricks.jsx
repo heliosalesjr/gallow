@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { BsBricks } from "react-icons/bs"; // Ícone da brick
 import { GiFireAxe } from "react-icons/gi"; // Ícone do machado
 import { motion } from "framer-motion";
@@ -17,7 +17,7 @@ const Bricks = () => {
   };
 
   return (
-    <div className="flex gap-2 justify-center items-center">
+    <div className="flex gap-2 justify-center items-center py-4">
       {bricks.map((isActive, index) => (
         <div key={index} className="relative">
           {/* Exibe o machado apenas se a brick está sendo quebrada */}
@@ -29,7 +29,7 @@ const Bricks = () => {
               transition={{ duration: 0.5 }}
               className="absolute -top-10 left-0"
             >
-              <GiFireAxe size={40} color="red" />
+              <GiFireAxe size={40} color="white" />
             </motion.div>
           )}
 
@@ -43,7 +43,7 @@ const Bricks = () => {
               exit={{ opacity: 0, scale: 0 }}
               transition={{ duration: 0.5 }}
             >
-              <BsBricks size={50} color="brown" />
+              <BsBricks size={50} className="bg-slate-300" color="#505050"/>
             </motion.div>
           )}
         </div>
