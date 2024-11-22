@@ -1,4 +1,5 @@
 import Header from "./components/Header"
+import Status from "./components/Status";
 import './index.css';
 
 function App() {
@@ -6,6 +7,7 @@ function App() {
   return (
     <>
       <Header />
+      <Status />
     </>
   )
 }
