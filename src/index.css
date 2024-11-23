@@ -15,3 +15,21 @@ body {
   display: flex;
   justify-content: center;
 }
+
+.word {
+  background-color: #323232;
+  
+  border-bottom: 2px solid #FFF;
+}
+
+.cont-word {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 5px;
+  
+}
+  
+
+  
