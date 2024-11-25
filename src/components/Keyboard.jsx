@@ -20,7 +20,7 @@ const AlphabetGrid = ({ currentWord, guessedLetters, setGuessedLetters }) => {
               <button
                 key={letter}
                 onClick={() => handleLetterClick(letter)}
-                className={`w-14 h-14 font-bold text-lg rounded-md shadow-md transition-transform transform hover:scale-110 focus:outline-none
+                className={`w-14 h-14 font-bold text-lg rounded-md text-black shadow-md transition-transform transform hover:scale-110 focus:outline-none
                 ${isGuessed ? (isCorrect ? 'bg-blue-400' : 'bg-red-400') : 'bg-yellow-400 hover:bg-yellow-500'}
                 `}
               >
