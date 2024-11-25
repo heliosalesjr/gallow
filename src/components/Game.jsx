@@ -15,7 +15,9 @@ const Game = () => {
   useEffect(() => {
     if (wrongAttempts >= 9) {
       setIsGameOver(true);
-      alert("Game Over");
+      setTimeout(() => {
+        alert("Game Over");
+      }, 2000); // Atraso de 2 segundos
     }
   }, [wrongAttempts]);
 
@@ -62,4 +64,5 @@ const Game = () => {
 };
 
 export default Game;
+
 
