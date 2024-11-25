@@ -1,31 +1,65 @@
-import { useState, useEffect } from 'react';
-import TheWord from './TheWord';
-import AlphabetGrid from './Keyboard';
+import { useState, useEffect } from "react";
+import TheWord from "./TheWord";
+import Keyboard from "./Keyboard";
+import Bricks from "./Bricks";
 
 const Game = () => {
-  // Lista de palavras
-  const wordList = ['REACT', 'JAVASCRIPT', 'PYTHON', 'TAILWIND', 'HANGMAN', 'REDUX', 'VUEJS', 'NODEJS', 'ANGULAR', 'GITHUB', 'TYPESCRIPT'];
-
-  // Estado da palavra atual e das letras adivinhadas
-  const [currentWord, setCurrentWord] = useState('');
+  const words = ["REACT", "JAVASCRIPT", "PYTHON", "FRAMER", "TAILWIND"];
+  const [currentWord, setCurrentWord] = useState(
+    words[Math.floor(Math.random() * words.length)]
+  );
   const [guessedLetters, setGuessedLetters] = useState([]);
+  const [wrongAttempts, setWrongAttempts] = useState(0);
+  const [isGameOver, setIsGameOver] = useState(false);
 
-  // Seleciona uma palavra aleatória ao carregar o componente
   useEffect(() => {
-    const randomIndex = Math.floor(Math.random() * wordList.length);
-    setCurrentWord(wordList[randomIndex]);
-  }, []);
+    if (wrongAttempts >= 9) {
+      setIsGameOver(true);
+      alert("Game Over");
+    }
+  }, [wrongAttempts]);
+
+  useEffect(() => {
+    if (currentWord.split("").every((letter) => guessedLetters.includes(letter))) {
+      setIsGameOver(true);
+    }
+  }, [guessedLetters, currentWord]);
+
+  const handleGuess = (letter) => {
+    if (!currentWord.includes(letter)) {
+      setWrongAttempts((prev) => Math.min(prev + 1, 9));
+    }
+    setGuessedLetters((prev) =>
+      prev.includes(letter) ? prev : [...prev, letter]
+    );
+  };
+
+  const startNewGame = () => {
+    setCurrentWord(words[Math.floor(Math.random() * words.length)]);
+    setGuessedLetters([]);
+    setWrongAttempts(0);
+    setIsGameOver(false);
+  };
 
   return (
-    <div className="p-8">
+    <div className="flex flex-col items-center">
       <TheWord currentWord={currentWord} guessedLetters={guessedLetters} />
-      <AlphabetGrid
+      <Bricks wrongAttempts={wrongAttempts} />
+      <Keyboard
         currentWord={currentWord}
         guessedLetters={guessedLetters}
-        setGuessedLetters={setGuessedLetters}
+        setGuessedLetters={handleGuess}
+        isGameOver={isGameOver}
       />
+      <button
+        onClick={startNewGame}
+        className="bg-sky-400 p-4 my-4 rounded-xl text-slate-800 font-bold px-16"
+      >
+        Novo Jogo
+      </button>
     </div>
   );
 };
 
 export default Game;
+
