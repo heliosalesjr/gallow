@@ -17,8 +17,8 @@ const Game = () => {
   useEffect(() => {
     if (wrongAttempts >= 9) {
       setGameMessage({
-        title: "Game Over",
-        message: `A palavra era: ${currentWord}`,
+        title: "Oh no!",
+        message: `The word was: ${currentWord}`,
         action: "Restart",
       });
       setIsGameOver(true);
@@ -28,8 +28,8 @@ const Game = () => {
   useEffect(() => {
     if (currentWord.split("").every((letter) => guessedLetters.includes(letter))) {
       setGameMessage({
-        title: "Parabéns!",
-        message: "Você acertou a palavra!",
+        title: "Good job",
+        message: "You got it right!",
         action: "Next Word",
       });
       setIsGameOver(true);
@@ -53,15 +53,17 @@ const Game = () => {
   };
 
   const handleGameAction = () => {
-  if (gameMessage.action === "Restart") {
-    startNewGame();
-  } else if (gameMessage.action === "Next Word") {
-    setCurrentWord(words[Math.floor(Math.random() * words.length)]);
-    setGuessedLetters([]);
-    setWrongAttempts(0);
-    setIsGameOver(false);
-    setGameMessage(null);
-  }
+    if (gameMessage.action === "Restart") {
+      startNewGame();
+      setGameMessage(null); // Resetar o estado do modal
+    } else if (gameMessage.action === "Next Word") {
+      setCurrentWord(words[Math.floor(Math.random() * words.length)]);
+      setGuessedLetters([]);
+      setWrongAttempts(0);
+      setIsGameOver(false);
+      setGameMessage(null); // Resetar o estado do modal
+    }
+  
 };
 
   return (
@@ -83,7 +85,7 @@ const Game = () => {
 
     {gameMessage && (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-        <div className="bg-white p-6 rounded-lg shadow-lg text-center">
+        <div className="bg-stone-600 p-6 rounded-lg shadow-lg text-center">
           <h2 className="text-2xl font-bold mb-4">{gameMessage.title}</h2>
           <p className="text-lg mb-6">{gameMessage.message}</p>
           <button
