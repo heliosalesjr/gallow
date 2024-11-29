@@ -2,12 +2,12 @@ import { useState, useEffect } from "react";
 import TheWord from "./TheWord";
 import Keyboard from "./Keyboard";
 import Bricks from "./Bricks";
-import { FaLaughWink } from "react-icons/fa"; // Importa o ícone de dica
+import wordsData from "../words.json"; // Importando o JSON
+import { FaLaughWink } from "react-icons/fa";
 
 const Game = () => {
-  const words = ["REACT", "JAVASCRIPT", "PYTHON", "FRAMER", "TAILWIND"];
-  const [currentWord, setCurrentWord] = useState(
-    words[Math.floor(Math.random() * words.length)]
+  const [currentWordData, setCurrentWordData] = useState(
+    wordsData[Math.floor(Math.random() * wordsData.length)]
   );
   const [guessedLetters, setGuessedLetters] = useState([]);
   const [wrongAttempts, setWrongAttempts] = useState(0);
@@ -20,7 +20,7 @@ const Game = () => {
     if (wrongAttempts >= 9) {
       setGameMessage({
         title: "Oh no!",
-        message: `The word was: ${currentWord}`,
+        message: `The word was: ${currentWordData.word}`,
         action: "Restart",
       });
       setIsGameOver(true);
@@ -28,20 +28,24 @@ const Game = () => {
   }, [wrongAttempts]);
 
   useEffect(() => {
-    if (currentWord.split("").every((letter) => guessedLetters.includes(letter))) {
-      setHintPoints((prev) => prev + 1); // Ganha 1 ponto de dica ao acertar
-      setScore((prev) => prev + 1); // Ganha 1 ponto geral ao acertar
+    if (
+      currentWordData.word
+        .split("")
+        .every((letter) => guessedLetters.includes(letter))
+    ) {
       setGameMessage({
         title: "Good job",
         message: "You got it right!",
         action: "Next Word",
       });
       setIsGameOver(true);
+      setHintPoints((prev) => prev + 1); // Ganha um ponto de dica ao acertar
+      setScore((prev) => prev + 1); // Incrementa a pontuação geral
     }
-  }, [guessedLetters, currentWord]);
+  }, [guessedLetters, currentWordData]);
 
   const handleGuess = (letter) => {
-    if (!currentWord.includes(letter)) {
+    if (!currentWordData.word.includes(letter)) {
       setWrongAttempts((prev) => Math.min(prev + 1, 9));
     }
     setGuessedLetters((prev) =>
@@ -50,7 +54,9 @@ const Game = () => {
   };
 
   const startNewGame = () => {
-    setCurrentWord(words[Math.floor(Math.random() * words.length)]);
+    setCurrentWordData(
+      wordsData[Math.floor(Math.random() * wordsData.length)]
+    );
     setGuessedLetters([]);
     setWrongAttempts(0);
     setIsGameOver(false);
@@ -59,40 +65,35 @@ const Game = () => {
   const handleGameAction = () => {
     if (gameMessage.action === "Restart") {
       startNewGame();
-      setGameMessage(null);
+      setGameMessage(null); // Resetar o estado do modal
     } else if (gameMessage.action === "Next Word") {
       startNewGame();
-      setGameMessage(null);
+      setGameMessage(null); // Resetar o estado do modal
     }
   };
 
   return (
-    <div className="flex flex-col items-center relative">
-      {/* Pontuação geral no canto superior direito */}
+    <div className="flex flex-col items-center">
       <div className="text-xl font-bold bg-green-600 p-2 rounded-lg shadow-md mb-4">
         Score: {score}
       </div>
 
-      {/* Palavras e jogo */}
-      <TheWord currentWord={currentWord} guessedLetters={guessedLetters} />
-      <Bricks wrongAttempts={wrongAttempts} />
-
-      {/* Dicas */}
+      <TheWord
+        currentWord={currentWordData.word}
+        guessedLetters={guessedLetters}
+      />
       <div className="flex items-center mt-4 gap-2">
         {[...Array(hintPoints)].map((_, index) => (
           <FaLaughWink key={index} size={32} color="orange" />
         ))}
       </div>
-
-      {/* Teclado */}
+      <Bricks wrongAttempts={wrongAttempts} />
       <Keyboard
-        currentWord={currentWord}
+        currentWord={currentWordData.word}
         guessedLetters={guessedLetters}
         setGuessedLetters={handleGuess}
         isGameOver={isGameOver}
       />
-
-      {/* Botão de novo jogo */}
       <button
         onClick={startNewGame}
         className="bg-sky-400 p-4 my-4 rounded-xl text-slate-800 font-bold px-16"
@@ -100,7 +101,6 @@ const Game = () => {
         New Game
       </button>
 
-      {/* Mensagem de final de jogo */}
       {gameMessage && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
           <div className="bg-stone-600 p-6 rounded-lg shadow-lg text-center">
