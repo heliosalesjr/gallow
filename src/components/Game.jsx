@@ -80,7 +80,7 @@ const Game = () => {
       onClick={startNewGame}
       className="bg-sky-400 p-4 my-4 rounded-xl text-slate-800 font-bold px-16"
     >
-      Novo Jogo
+      New Game
     </button>
 
     {gameMessage && (
