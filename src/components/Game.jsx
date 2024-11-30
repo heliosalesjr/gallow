@@ -40,6 +40,7 @@ const Game = () => {
         action: "Next Word",
       });
       setIsGameOver(true);
+      // Adiciona apenas uma nova dica
       setHintPoints((prev) => [...prev, { used: false }]);
       setScore((prev) => prev + 1); // Incrementa a pontuação geral
       setUsedHints(0); // Reseta as dicas usadas para a nova palavra
@@ -56,9 +57,8 @@ const Game = () => {
   };
 
   const startNewGame = () => {
-    setCurrentWordData(
-      wordsData[Math.floor(Math.random() * wordsData.length)]
-    );
+    const newWordData = wordsData[Math.floor(Math.random() * wordsData.length)];
+    setCurrentWordData(newWordData);
     setGuessedLetters([]);
     setWrongAttempts(0);
     setIsGameOver(false);
