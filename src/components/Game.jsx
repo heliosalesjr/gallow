@@ -13,7 +13,7 @@ const Game = () => {
   const [wrongAttempts, setWrongAttempts] = useState(0);
   const [isGameOver, setIsGameOver] = useState(false);
   const [gameMessage, setGameMessage] = useState(null);
-  const [hintPoints, setHintPoints] = useState(0); // Estado para pontos de dica
+  const [hintPoints, setHintPoints] = useState([]);
   const [score, setScore] = useState(0); // Estado para pontuação geral
   const [usedHints, setUsedHints] = useState(0); // Estado para acompanhar as dicas usadas
 
@@ -40,7 +40,7 @@ const Game = () => {
         action: "Next Word",
       });
       setIsGameOver(true);
-      setHintPoints((prev) => prev + 1); // Ganha um ponto de dica ao acertar
+      setHintPoints((prev) => [...prev, { used: false }]);
       setScore((prev) => prev + 1); // Incrementa a pontuação geral
       setUsedHints(0); // Reseta as dicas usadas para a nova palavra
     }
@@ -66,32 +66,38 @@ const Game = () => {
   };
 
   const handleGameAction = () => {
-    if (gameMessage.action === "Restart") {
+    if (gameMessage.action === "Restart" || gameMessage.action === "Next Word") {
       startNewGame();
-      setGameMessage(null); // Resetar o estado do modal
-    } else if (gameMessage.action === "Next Word") {
-      startNewGame();
-      setGameMessage(null); // Resetar o estado do modal
     }
+    setGameMessage(null); // Fecha o modal para qualquer ação
+  
   };
 
-  const handleHintClick = () => {
-    if (usedHints < currentWordData.tips.length) {
-      // Mostra a próxima dica
+  const handleHintClick = (index) => {
+    if (hintPoints[index].used) return; // Ignora cliques em dicas já usadas
+  
+    const availableTip = currentWordData.tips.find((tip, i) => !hintPoints.some((h) => h.used && h.tipIndex === i));
+    
+    if (availableTip) {
       setGameMessage({
-        title: "Hint",
-        message: currentWordData.tips[usedHints],
+        title: "Tip",
+        message: availableTip,
         action: "Close",
       });
-      setUsedHints((prev) => prev + 1); // Incrementa o número de dicas usadas
+      setHintPoints((prev) =>
+        prev.map((hint, i) =>
+          i === index ? { ...hint, used: true, tipIndex: currentWordData.tips.indexOf(availableTip) } : hint
+        )
+      );
     } else {
-      // Mostra mensagem de que não há mais dicas
       setGameMessage({
         title: "No more tips available",
-        message: "You've used all the hints for this word.",
+        message: "You have used all tips for this word!",
         action: "Close",
       });
     }
+  
+  
   };
 
   return (
@@ -105,14 +111,14 @@ const Game = () => {
         guessedLetters={guessedLetters}
       />
       <div className="flex items-center mt-4 gap-2">
-        {[...Array(hintPoints)].map((_, index) => (
-          <FaLaughWink
-            key={index}
-            size={32}
-            color="orange"
-            className="cursor-pointer"
-            onClick={handleHintClick} // Adiciona o evento de clique
-          />
+      {hintPoints.map((hint, index) => (
+        <FaLaughWink
+          key={index}
+          size={32}
+          color={hint.used ? "gray" : "orange"}
+          className="cursor-pointer"
+          onClick={() => handleHintClick(index)}
+        />
         ))}
       </div>
       <Bricks wrongAttempts={wrongAttempts} />
