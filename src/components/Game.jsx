@@ -15,6 +15,7 @@ const Game = () => {
   const [gameMessage, setGameMessage] = useState(null);
   const [hintPoints, setHintPoints] = useState(0); // Estado para pontos de dica
   const [score, setScore] = useState(0); // Estado para pontuação geral
+  const [usedHints, setUsedHints] = useState(0); // Estado para acompanhar as dicas usadas
 
   useEffect(() => {
     if (wrongAttempts >= 9) {
@@ -41,6 +42,7 @@ const Game = () => {
       setIsGameOver(true);
       setHintPoints((prev) => prev + 1); // Ganha um ponto de dica ao acertar
       setScore((prev) => prev + 1); // Incrementa a pontuação geral
+      setUsedHints(0); // Reseta as dicas usadas para a nova palavra
     }
   }, [guessedLetters, currentWordData]);
 
@@ -60,6 +62,7 @@ const Game = () => {
     setGuessedLetters([]);
     setWrongAttempts(0);
     setIsGameOver(false);
+    setUsedHints(0); // Reseta as dicas usadas
   };
 
   const handleGameAction = () => {
@@ -69,6 +72,25 @@ const Game = () => {
     } else if (gameMessage.action === "Next Word") {
       startNewGame();
       setGameMessage(null); // Resetar o estado do modal
+    }
+  };
+
+  const handleHintClick = () => {
+    if (usedHints < currentWordData.tips.length) {
+      // Mostra a próxima dica
+      setGameMessage({
+        title: "Hint",
+        message: currentWordData.tips[usedHints],
+        action: "Close",
+      });
+      setUsedHints((prev) => prev + 1); // Incrementa o número de dicas usadas
+    } else {
+      // Mostra mensagem de que não há mais dicas
+      setGameMessage({
+        title: "No more tips available",
+        message: "You've used all the hints for this word.",
+        action: "Close",
+      });
     }
   };
 
@@ -84,7 +106,13 @@ const Game = () => {
       />
       <div className="flex items-center mt-4 gap-2">
         {[...Array(hintPoints)].map((_, index) => (
-          <FaLaughWink key={index} size={32} color="orange" />
+          <FaLaughWink
+            key={index}
+            size={32}
+            color="orange"
+            className="cursor-pointer"
+            onClick={handleHintClick} // Adiciona o evento de clique
+          />
         ))}
       </div>
       <Bricks wrongAttempts={wrongAttempts} />
