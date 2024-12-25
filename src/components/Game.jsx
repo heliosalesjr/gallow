@@ -17,17 +17,42 @@ const Game = () => {
   const [score, setScore] = useState(0); // Estado para pontuação geral
   const [usedHints, setUsedHints] = useState(0); // Estado para acompanhar as dicas usadas
 
-  useEffect(() => {
-    if (wrongAttempts >= 9) {
-      setGameMessage({
-        title: "Oh no!",
-        message: `The word was: ${currentWordData.word}`,
-        action: "Restart",
-      });
-      setIsGameOver(true);
-    }
-  }, [wrongAttempts]);
+  // Gerencia o reset do jogo completo
+  const startNewGame = () => {
+    const newWordData = wordsData[Math.floor(Math.random() * wordsData.length)];
+    setCurrentWordData(newWordData); // Escolhe uma nova palavra
+    setGuessedLetters([]); // Reseta as letras adivinhadas
+    setWrongAttempts(0); // Reseta as tentativas erradas
+    setIsGameOver(false); // Define o jogo como não terminado
+    setHintPoints([]); // Reseta as dicas para vazio
+    setScore(0); // Reseta a pontuação
+    setUsedHints(0); // Reseta o contador de dicas usadas
+  };
 
+  // Próxima palavra ou reinício do jogo
+  const handleGameAction = () => {
+    if (gameMessage.action === "Next Word") {
+      const newWordData =
+        wordsData[Math.floor(Math.random() * wordsData.length)];
+      setCurrentWordData(newWordData);
+      setGuessedLetters([]);
+      setWrongAttempts(0);
+      setIsGameOver(false);
+    }
+    setGameMessage(null); // Fecha o modal
+  };
+
+  // Lógica ao clicar em uma letra
+  const handleGuess = (letter) => {
+    if (!currentWordData.word.includes(letter)) {
+      setWrongAttempts((prev) => Math.min(prev + 1, 9));
+    }
+    setGuessedLetters((prev) =>
+      prev.includes(letter) ? prev : [...prev, letter]
+    );
+  };
+
+  // Gerencia quando o jogador ganha ou perde
   useEffect(() => {
     if (
       currentWordData.word
@@ -40,47 +65,29 @@ const Game = () => {
         action: "Next Word",
       });
       setIsGameOver(true);
-      // Adiciona apenas uma nova dica
-      setHintPoints((prev) => [...prev, { used: false }]);
       setScore((prev) => prev + 1); // Incrementa a pontuação geral
-      setUsedHints(0); // Reseta as dicas usadas para a nova palavra
+      setHintPoints((prev) => [...prev, { used: false }]); // Adiciona uma nova dica
     }
-  }, [guessedLetters, currentWordData]);
 
-  const handleGuess = (letter) => {
-    if (!currentWordData.word.includes(letter)) {
-      setWrongAttempts((prev) => Math.min(prev + 1, 9));
+    if (wrongAttempts >= 9) {
+      setGameMessage({
+        title: "Oh no!",
+        message: `The word was: ${currentWordData.word}`,
+        action: "Restart",
+      });
+      setIsGameOver(true);
     }
-    setGuessedLetters((prev) =>
-      prev.includes(letter) ? prev : [...prev, letter]
-    );
-  };
+  }, [guessedLetters, wrongAttempts]);
 
-  const startNewGame = () => {
-    const newWordData = wordsData[Math.floor(Math.random() * wordsData.length)];
-    setCurrentWordData(newWordData); // Escolhe uma nova palavra
-    setGuessedLetters([]); // Reseta as letras adivinhadas
-    setWrongAttempts(0); // Reseta as tentativas erradas
-    setIsGameOver(false); // Define o jogo como não terminado
-    setHintPoints([]); // Reseta as dicas para vazio
-    setScore(0); // Reseta a pontuação
-    setUsedHints(0); // Reseta o contador de dicas usadas
-  };
-  
-
-  const handleGameAction = () => {
-    if (gameMessage.action === "Restart" || gameMessage.action === "Next Word") {
-      startNewGame();
-    }
-    setGameMessage(null); // Fecha o modal para qualquer ação
-  
-  };
-
+  // Lógica ao clicar em uma dica
   const handleHintClick = (index) => {
-    if (hintPoints[index].used) return; // Ignora cliques em dicas já usadas
-  
-    const availableTip = currentWordData.tips.find((tip, i) => !hintPoints.some((h) => h.used && h.tipIndex === i));
-    
+    if (hintPoints[index]?.used) return; // Ignora cliques em dicas já usadas
+
+    const availableTip = currentWordData.tips.find(
+      (tip, i) =>
+        !hintPoints.some((hint) => hint.used && hint.tipIndex === i)
+    );
+
     if (availableTip) {
       setGameMessage({
         title: "Tip",
@@ -89,7 +96,9 @@ const Game = () => {
       });
       setHintPoints((prev) =>
         prev.map((hint, i) =>
-          i === index ? { ...hint, used: true, tipIndex: currentWordData.tips.indexOf(availableTip) } : hint
+          i === index
+            ? { ...hint, used: true, tipIndex: currentWordData.tips.indexOf(availableTip) }
+            : hint
         )
       );
     } else {
@@ -99,8 +108,6 @@ const Game = () => {
         action: "Close",
       });
     }
-  
-  
   };
 
   return (
@@ -114,14 +121,14 @@ const Game = () => {
         guessedLetters={guessedLetters}
       />
       <div className="flex items-center mt-4 gap-2">
-      {hintPoints.map((hint, index) => (
-        <FaLaughWink
-          key={index}
-          size={32}
-          color={hint.used ? "gray" : "orange"}
-          className="cursor-pointer"
-          onClick={() => handleHintClick(index)}
-        />
+        {hintPoints.map((hint, index) => (
+          <FaLaughWink
+            key={index}
+            size={32}
+            color={hint.used ? "gray" : "orange"}
+            className="cursor-pointer"
+            onClick={() => handleHintClick(index)}
+          />
         ))}
       </div>
       <Bricks wrongAttempts={wrongAttempts} />
