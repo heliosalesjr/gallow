@@ -58,12 +58,15 @@ const Game = () => {
 
   const startNewGame = () => {
     const newWordData = wordsData[Math.floor(Math.random() * wordsData.length)];
-    setCurrentWordData(newWordData);
-    setGuessedLetters([]);
-    setWrongAttempts(0);
-    setIsGameOver(false);
-    setUsedHints(0); // Reseta as dicas usadas
+    setCurrentWordData(newWordData); // Escolhe uma nova palavra
+    setGuessedLetters([]); // Reseta as letras adivinhadas
+    setWrongAttempts(0); // Reseta as tentativas erradas
+    setIsGameOver(false); // Define o jogo como não terminado
+    setHintPoints([]); // Reseta as dicas para vazio
+    setScore(0); // Reseta a pontuação
+    setUsedHints(0); // Reseta o contador de dicas usadas
   };
+  
 
   const handleGameAction = () => {
     if (gameMessage.action === "Restart" || gameMessage.action === "Next Word") {
